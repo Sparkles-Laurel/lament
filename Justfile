@@ -15,22 +15,24 @@
 ## along with this program.  If not, see <https://www.gnu.org/licenses/>.
 set unstable
 
-_cc := require("clang")
-_cxx := require("clang++")
-asdf := require("asdf")
-lua := require("lua")
+# for compiling Lua
+lua := require("luajit") || require("lua")
 luac := require("luac")
 luarocks := require("luarocks")
-podman := require("podman")
-lualatex := which("lualatex")
 luacheck := require("luacheck")
+
+# for testing environment
+podman := require("podman")
 busted := require("busted")
+
+# for documentation
+lualatex := which("lualatex")
+
 
 [group("util")]
 setup-env:
-    {{asdf}} set lua 5.1
-    {{asdf}} reshim
     {{luarocks}} install lanes
+
 [group("test")]
 lint:
     {{luarocks}} lint lament-*.rockspec
@@ -41,3 +43,5 @@ test:
 [group("build")]
 build: setup-env test
     {{luarocks}} build
+doc-build:
+    {{lualatex}} docs/README.tex

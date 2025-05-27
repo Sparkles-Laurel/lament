@@ -72,3 +72,15 @@ end
 function lament.backend.Backend:recalibrate()
    return true
 end
+
+--- Determines whether the backend is the configuration backend for LAMENT itself
+function lament.backend.Backend:is_auto()
+   -- LAMENT's auto-configuration backend is named `lament._sysconf.lament`
+   -- The only hive created by the auto-config is called `lament.lament`
+   -- and this hive is unique to LAMENT - no other hive is allowed to create an auto-configuration
+   -- This table declares a list of keys that will be more clearly determined
+   -- in the future.
+
+   -- TODO: apply more sanitized checks
+   return self.name == "lament"
+end

@@ -43,7 +43,7 @@ function lament.executor.start_application()
       if not lament.backends[i].apply() then
          switch(cease_and) {
             [case(lament.executor.CeaseAnd.halt)] = function()
-               error(string.format("Backend %s failed", lament.backends[i].name), 2)
+               error(string.format("Backend %s failed to apply", lament.backends[i].name), 2)
             end,
             [case(lament.executor.CeaseAnd.infer_from_effective)] = function()
                -- TODO: implement inference from effective state
@@ -61,7 +61,35 @@ function lament.executor.start_application()
    end
 end
 
+--- Starts recalibration of the system state according to the present state
+--- If the present state is malconfigured, performs the desired resolution
+--- as defined by the key `cease_and` in the auto-config.
 function lament.executor.start_recalibration()
+   -- Obtain cessation behavior
+   local cease_and = lament._sysconf.lament.cease_and or lament.executor.CeaseAnd.load_last
+   -- Prepare backends
+   lament.boot_backends()
+   -- Apply backwards (commit recalibration)
+   for i = 1, #lament.backends do
+      if not lament.backends[i].recalibrate() then
+         switch(cease_and) {
+            [case(lament.executor.CeaseAnd.halt)] = function ()
+               error(string.format("Backend %s failed to recalibrate", lament.backends[i].name), 2)
+            end,
+            [case(lament.executor.CeaseAnd.infer_from_effective)] = function ()
+               -- TODO: implement inference from effective state
+            end,
+            [case(lament.executor.CeaseAnd.infer_from_desired)] = function ()
+               -- TODO: implement inference from desired state
+            end,
+            [case(lament.executor.CeaseAnd.load_last)] = function ()
+               -- TODO: implement conflict resolution
+            end
+         }
+      end
+   end
 end
+
+lament.executor.__cessation_actions = {}
 
 return lament.executor

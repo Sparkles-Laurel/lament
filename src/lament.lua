@@ -15,19 +15,22 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-local lament = require("lament.executor")
 
-local lament = {
+local lament = require('lament')
+local conf = {}
+
+conf.lament = {
    --- Global system state
    _sysconf = {
       --- Self-configuration of LAMENT
       ["lament"] = {
-         _auto = true,
          --- Behaviour of LAMENT in case application fails
          cease_and = lament.executor.CeaseAnd.halt
       }
    }
 }
+
+-- The global configuration table is a special table. It needs to override the
 
 require('lament.hive')
 require('lament.key')
